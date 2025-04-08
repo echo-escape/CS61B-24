@@ -1,6 +1,7 @@
 package deque;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ArrayDeque61B<T> implements Deque61B<T> {
@@ -41,11 +42,7 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         firstIndex = newCapacity - 1;
         lastIndex = size;
     }
-    /**
-     * Add {@code x} to the front of the deque. Assumes {@code x} is never null.
-     *
-     * @param x item to add
-     */
+
     @Override
     public void addFirst(T x) {
         if (size == array.length) {
@@ -56,11 +53,7 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         size++;
     }
 
-    /**
-     * Add {@code x} to the back of the deque. Assumes {@code x} is never null.
-     *
-     * @param x item to add
-     */
+
     @Override
     public void addLast(T x) {
         if (size == array.length) {
@@ -71,11 +64,7 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         size++;
     }
 
-    /**
-     * Returns a List copy of the deque. Does not alter the deque.
-     *
-     * @return a new list copy of the deque.
-     */
+
     @Override
     public List<T> toList() {
         List<T> list = new ArrayList<>();
@@ -85,31 +74,19 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         return list;
     }
 
-    /**
-     * Returns if the deque is empty. Does not alter the deque.
-     *
-     * @return {@code true} if the deque has no elements, {@code false} otherwise.
-     */
+
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
-    /**
-     * Returns the size of the deque. Does not alter the deque.
-     *
-     * @return the number of items in the deque.
-     */
+
     @Override
     public int size() {
         return size;
     }
 
-    /**
-     * Remove and return the element at the front of the deque, if it exists.
-     *
-     * @return removed element, otherwise {@code null}.
-     */
+
     @Override
     public T removeFirst() {
         double usage = 1.0 * size / fullSize;
@@ -124,11 +101,7 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         return temp;
     }
 
-    /**
-     * Remove and return the element at the back of the deque, if it exists.
-     *
-     * @return removed element, otherwise {@code null}.
-     */
+
     @Override
     public T removeLast() {
         double usage = 1.0 * size / fullSize;
@@ -143,15 +116,7 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         return temp;
     }
 
-    /**
-     * The Deque61B abstract data type does not typically have a get method,
-     * but we've included this extra operation to provide you with some
-     * extra programming practice. Gets the element, iteratively. Returns
-     * null if index is out of bounds. Does not alter the deque.
-     *
-     * @param index index to get
-     * @return element at {@code index} in the deque
-     */
+
     @Override
     public T get(int index) {
         if (index < 0 || index >= size) {
@@ -162,17 +127,63 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
     }
 
 
-    /**
-     * This method technically shouldn't be in the interface, but it's here
-     * to make testing nice. Gets an element, recursively. Returns null if
-     * index is out of bounds. Does not alter the deque.
-     *
-     * @param index index to get
-     * @return element at {@code index} in the deque
-     */
     @Override
     public T getRecursive(int index) {
         throw new UnsupportedOperationException("No need to implement getRecursive for proj 1b");
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayIterator();
+    }
+
+    private class ArrayIterator implements Iterator<T> {
+        private int innerIndex;
+
+        public ArrayIterator() {
+            innerIndex = 0;
+        }
+
+        public boolean hasNext() {
+            return innerIndex < size;
+        }
+
+        public T next() {
+            T returnItem = get(innerIndex);
+            innerIndex++;
+            return returnItem;
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ArrayDeque61B)) {
+            return false;
+        }
+        ArrayDeque61B<?> other = (ArrayDeque61B<?>) obj;
+        if (size != other.size) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (this.get(i) != other.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < this.size - 1; i++) {
+            sb.append(get(i).toString() + ", ");
+        }
+        sb.append(get(this.size - 1).toString());
+        sb.append("]");
+        return sb.toString();
     }
 }
 

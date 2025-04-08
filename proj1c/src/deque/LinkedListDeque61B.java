@@ -1,6 +1,7 @@
 package deque;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class LinkedListDeque61B<T> implements Deque61B<T> {
@@ -176,6 +177,60 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         else {
             return getRecursive(current.next, index - 1);
         }
+    }
+
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ListIterator();
+    }
+
+    private class ListIterator implements Iterator<T> {
+        private Node current;
+        public ListIterator() {
+            current = sentinel.next;
+        }
+
+        public boolean hasNext() {
+            return current != lastSentinel;
+        }
+
+        public T next() {
+            T returnItem = current.item;
+            current = current.next;
+            return returnItem;
+        }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof LinkedListDeque61B<?>) {
+            LinkedListDeque61B<?> that = (LinkedListDeque61B<?>) other;
+            if (this.size != that.size()) {
+                return false;
+            }
+            for (int i = 0; i < this.size; i++) {
+                if (this.get(i) != that.get(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < this.size - 1; i++) {
+            sb.append(get(i).toString() + ", ");
+        }
+        sb.append(get(this.size - 1).toString());
+        sb.append("]");
+        return sb.toString();
     }
 
 }

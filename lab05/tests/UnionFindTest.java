@@ -86,6 +86,15 @@ public class UnionFindTest {
      * of all methods in your implementation.
      */
 
+    @Test
+    public void testFindAndSizeOf() {
+        UnionFind uf = new UnionFind(4);
+        assertThat(uf.find(0)).isEqualTo(0);
+        assertThat(uf.sizeOf(0)).isEqualTo(1);
+    }
+
+
+
 }
 
 

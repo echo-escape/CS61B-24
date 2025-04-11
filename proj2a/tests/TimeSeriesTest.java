@@ -2,11 +2,13 @@ import ngrams.TimeSeries;
 
 import org.junit.jupiter.api.Test;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** Unit Tests for the TimeSeries class.
  *  @author Josh Hug
@@ -54,5 +56,54 @@ public class TimeSeriesTest {
 
         assertThat(totalPopulation.years()).isEmpty();
         assertThat(totalPopulation.data()).isEmpty();
+    }
+
+    @Test
+    public void testYearsAndData() {
+        TimeSeries catPopulation = new TimeSeries();
+        catPopulation.put(1991, 0.0);
+        catPopulation.put(1992, 100.0);
+        catPopulation.put(1994, 200.0);
+        List<Integer> expectedYears = new ArrayList<>
+                (Arrays.asList(1991, 1992, 1994));
+        List<Double> expectedDta = new ArrayList<>
+                (Arrays.asList(0.0, 100.0, 200.0));
+        assertThat(catPopulation.years()).isEqualTo(expectedYears);
+        assertThat(catPopulation.data()).isEqualTo(expectedDta);
+    }
+
+    @Test
+    public void testDividedByIgnore() {
+        TimeSeries catPopulation = new TimeSeries();
+        catPopulation.put(1991, 0.0);
+        TimeSeries dogPopulation = new TimeSeries();
+        dogPopulation.put(1992, 100.0);
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> catPopulation.dividedBy(dogPopulation)
+        );
+        assertThat(thrown).hasMessageThat().contains("Missing year in the provided TimeSeries");
+    }
+
+    @Test
+    public void testDividedByBasic() {
+        TimeSeries catPopulation = new TimeSeries();
+        catPopulation.put(1991, 0.0);
+        catPopulation.put(1992, 100.0);
+        catPopulation.put(1994, 200.0);
+        TimeSeries dogPopulation = new TimeSeries();
+        dogPopulation.put(1991, 400.0);
+        dogPopulation.put(1992, 500.0);
+        dogPopulation.put(1994, 800.0);
+        TimeSeries dividedBy = catPopulation.dividedBy(dogPopulation);
+        // excepted: (1991, 0.0), (1992, 0.5), (1994, 0.25)
+
+        List<Integer> expectedYears = new ArrayList<>(Arrays.asList(1991, 1992, 1994));
+        assertThat(dividedBy.years()).isEqualTo(expectedYears);
+
+        List<Double> expectedData = new ArrayList<>(Arrays.asList(0.0, 0.2, 0.25));
+        for (int i = 0; i < expectedData.size(); i += 1) {
+            assertThat(dividedBy.data().get(i)).isWithin(1E-10).of(expectedData.get(i));
+        }
     }
 } 

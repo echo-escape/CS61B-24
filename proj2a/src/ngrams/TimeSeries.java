@@ -80,45 +80,24 @@ public class TimeSeries extends TreeMap<Integer, Double> {
         if (ts == null && this.isEmpty()) {
             return new TimeSeries();
         }
-        if (!this.isEmpty()) {
-            if (ts != null) {
-               newTs = plusHepler(this, ts);
-            }
-            else {
-                newTs = this;
-            }
+        for (int year : years()) {
+            newTs.put(year, get(year));
         }
-        else {
-            newTs = ts;
+
+
+        if (ts != null) {
+            for (int year : ts.years()) {
+                if (newTs.containsKey(year)) {
+                    newTs.put(year, newTs.get(year) + ts.get(year));
+                }
+                else {
+                    newTs.put(year, ts.get(year));
+                }
+            }
         }
         return newTs;
     }
 
-    private TimeSeries plusHepler(TimeSeries source, TimeSeries target) {
-        TimeSeries newTs = new TimeSeries();
-        List<Integer> years = source.years();
-        List<Double> data = source.data();
-        for (int i = 0; i < years.size(); i++) {
-            int year = years.get(i);
-            if (target.containsKey(year)) {
-                double newValue = data.get(i) + target.get(year);
-                target.remove(year);
-                newTs.put(year, newValue);
-            }
-            else {
-                double newValue = data.get(i);
-                newTs.put(year, newValue);
-            }
-        }
-        if (target != null) {
-            for (int i = 0; i < target.years().size(); i++) {
-                int year = target.years().get(i);
-                double newValue = target.get(year);
-                newTs.put(year, newValue);
-            }
-        }
-        return newTs;
-    }
 
     /**
      * Returns the quotient of the value for each year this TimeSeries divided by the
@@ -137,13 +116,13 @@ public class TimeSeries extends TreeMap<Integer, Double> {
         for (int i = 0; i < years.size(); i++) {
             int year = years.get(i);
             if (ts.containsKey(year)) {
-                double divisor = data.get(i);
-                double division = ts.get(year);
-                double quotient = divisor / division;
+                double denominator = data.get(i);
+                double numerator = ts.get(year);
+                double quotient = denominator / numerator;
                 newTs.put(year, quotient);
             }
             else {
-                throw new IllegalArgumentException("Missing year in the provided TimeSeries");
+                throw new IllegalArgumentException("Missing year: " + year);
             }
         }
         return newTs;

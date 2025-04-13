@@ -73,4 +73,36 @@ public class NGramMapTest {
         assertThat(fishPlusDogWeight.get(1865)).isWithin(1E-10).of(expectedFishPlusDogWeight1865);
     }
 
+    @Test
+    public void testDefensiveCopyInCountHistory() {
+        // 构造 NGramMap 对象，使用较短的测试文件
+        NGramMap ngm = new NGramMap(SHORT_WORDS_FILE, TOTAL_COUNTS_FILE);
+
+        // 获取 "request" 单词在 2005~2008 年间的历史记录
+        TimeSeries tsCopy = ngm.countHistory("request", 2005, 2008);
+
+        // 修改拷贝中的数据
+        tsCopy.put(2005, 0.0);
+
+        // 重新获取同一单词相同时间段的记录
+        TimeSeries tsOriginal = ngm.countHistory("request", 2005, 2008);
+
+        // 验证原始数据中的 2005 年数据不受之前修改的影响
+        // 预期值为 646179.0（参照给出的测试数据）
+        assertThat(tsOriginal.get(2005)).isWithin(1E-10).of(646179.0);
+    }
+
+    /**
+     * 测试对不存在单词的请求：
+     * 请求一个数据中不存在的单词，应该返回一个空的 TimeSeries。
+     */
+    @Test
+    public void testNonExistentWord() {
+        NGramMap ngm = new NGramMap(SHORT_WORDS_FILE, TOTAL_COUNTS_FILE);
+        TimeSeries ts = ngm.countHistory("thisWordDoesNotExist", 2005, 2008);
+        // 验证返回的 TimeSeries 为空
+        assertThat(ts.years()).isEmpty();
+        assertThat(ts.data()).isEmpty();
+    }
+
 }  

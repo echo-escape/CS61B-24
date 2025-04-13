@@ -23,10 +23,10 @@ public class PlotDemo {
 
         XYChart chart = Plotter.generateTimeSeriesChart(words, lts);
         String s = Plotter.encodeChartAsString(chart);
-        System.out.println(s);
+//        System.out.println(s);
 
         // you can also do this to display locally:
-        // Plotter.displayChart(chart);
+         Plotter.displayChart(chart);
 
     }
 }

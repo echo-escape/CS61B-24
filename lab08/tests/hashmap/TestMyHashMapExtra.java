@@ -18,8 +18,8 @@ public class TestMyHashMapExtra {
         q.put("a", "a");
         q.put("d", "a");
         q.put("e", "a"); // a b c d e
-        assertThat(q.remove("c")).isNotNull();
-        assertThat(q.remove("f")).isNull();
+        assertThat(q.remove("c")).isNotNull(); // a b d e
+        assertThat(q.remove("f")).isNull(); // a b d e
         assertThat(q.containsKey("c")).isFalse();
         assertThat(q.containsKey("a")).isTrue();
         assertThat(q.containsKey("b")).isTrue();

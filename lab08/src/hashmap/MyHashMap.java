@@ -1,9 +1,6 @@
 package hashmap;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 /**
  *  A hash table-backed Map implementation.
@@ -210,9 +207,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public void clear() {
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = null;
-        }
+        Arrays.fill(buckets, null);
         size = 0;
     }
 
@@ -222,7 +217,17 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public Set<K> keySet() {
-        return Set.of();
+        Set<K> keySet = new HashSet<>();
+        for (Collection<Node> bucket : buckets) {
+            if (bucket != null) {
+                for (Node node : bucket) {
+                    if (node.key != null) {
+                        keySet.add(node.key);
+                    }
+                }
+            }
+        }
+        return keySet;
     }
 
     /**
@@ -235,7 +240,29 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public V remove(K key) {
-        return null;
+        V value;
+        if (containsKey(key)) {
+            value = get(key);
+            int hash = key.hashCode();
+            int index = Math.floorMod(hash, buckets.length);
+            Collection<Node> bucket = buckets[index];
+            if (bucket == null) {
+                return null;
+            }
+            else {
+                Collection<Node> newBucket = createBucket();
+                for (Node node : bucket) {
+                    if (!node.key.equals(key)) {
+                        newBucket.add(node);
+                    }
+                }
+                buckets[index] = newBucket;
+            }
+        }
+        else {
+            return null;
+        }
+        return value;
     }
 
     /**
@@ -245,9 +272,36 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public Iterator<K> iterator() {
-        return null;
+        return new MyIterator();
     }
 
+    private class MyIterator implements Iterator<K> {
 
+        private
+        MyIterator() {
 
+        }
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         * (In other words, returns {@code true} if {@link #next} would
+         * return an element rather than throwing an exception.)
+         *
+         * @return {@code true} if the iteration has more elements
+         */
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
+        @Override
+        public K next() {
+            return null;
+        }
+    }
 }

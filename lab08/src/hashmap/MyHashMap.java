@@ -1,6 +1,9 @@
 package hashmap;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  *  A hash table-backed Map implementation.
@@ -26,12 +29,22 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /* Instance Variables */
     private Collection<Node>[] buckets;
+    private int size;
+    private double loadFactor;
     // You should probably define some more!
 
     /** Constructors */
-    public MyHashMap() { }
+    public MyHashMap() {
+        buckets = new Collection[16];
+        size = 0;
+        loadFactor = 0.75;
+    }
 
-    public MyHashMap(int initialCapacity) { }
+    public MyHashMap(int initialCapacity) {
+        buckets = new Collection[initialCapacity];
+        size = 0;
+        loadFactor = 0.75;
+    }
 
     /**
      * MyHashMap constructor that creates a backing array of initialCapacity.
@@ -40,7 +53,11 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialCapacity initial size of backing array
      * @param loadFactor maximum load factor
      */
-    public MyHashMap(int initialCapacity, double loadFactor) { }
+    public MyHashMap(int initialCapacity, double loadFactor) {
+        buckets = new Collection[initialCapacity];
+        size = 0;
+        this.loadFactor = loadFactor;
+    }
 
     /**
      * Returns a data structure to be a hash table bucket
@@ -64,10 +81,173 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     protected Collection<Node> createBucket() {
         // TODO: Fill in this method.
-        return null;
+        return new LinkedList<>();
     }
 
     // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
+
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the map already contains the specified key, replaces the key's mapping
+     * with the value specified.
+     *
+     * @param key
+     * @param value
+     */
+    @Override
+    public void put(K key, V value) {
+        int hash = key.hashCode();
+        int index = Math.floorMod(hash, buckets.length);
+        Collection<Node> bucket = buckets[index];
+        Node newNode = new Node(key, value);
+
+        if (!containsKey(key)) {
+            if (bucket == null) {
+                bucket = createBucket();
+            }
+            bucket.add(newNode);
+            buckets[index] = bucket;
+            size++;
+        }
+        else {
+            for (Node node : bucket) {
+                if (node.key.equals(key)) {
+                    node.value = value;
+                }
+            }
+        }
+
+        double check = size / (double) buckets.length;
+        if (check >= loadFactor) {
+            resizeBuckets();
+        }
+    }
+
+    private void resizeBuckets() {
+        int newCapacity = buckets.length * 2;
+        Collection<Node>[] newBuckets = new Collection[newCapacity];
+        for (Collection<Node> bucket : buckets) {
+            if (bucket != null) {
+                for (Node node : bucket) {
+                    if (node != null) {
+                        int hash = node.key.hashCode();
+                        int index = Math.floorMod(hash, newBuckets.length);
+                        Collection<Node> newBucket = newBuckets[index];
+                        if (newBucket == null) {
+                            newBucket = createBucket();
+                        }
+                        newBucket.add(node);
+                        newBuckets[index] = newBucket;
+                    }
+                }
+            }
+        }
+        buckets = newBuckets;
+
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or null if this
+     * map contains no mapping for the key.
+     *
+     * @param key
+     */
+    @Override
+    public V get(K key) {
+        if (!containsKey(key)) {
+            return null;
+        }
+        int hash = key.hashCode();
+        int index = Math.floorMod(hash, buckets.length);
+        Collection<Node> bucket = buckets[index];
+        if (bucket == null) {
+            return null;
+        }
+        else {
+            for (Node node : bucket) {
+                if (node.key.equals(key)) {
+                    return node.value;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns whether this map contains a mapping for the specified key.
+     *
+     * @param key
+     */
+    @Override
+    public boolean containsKey(K key) {
+        int hash = key.hashCode();
+        int index = Math.floorMod(hash, buckets.length);
+        Collection<Node> bucket = buckets[index];
+        if (bucket == null) {
+            return false;
+        }
+        else {
+            for (Node node : bucket) {
+                if (node.key.equals(key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.
+     */
+    @Override
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Removes every mapping from this map.
+     */
+    @Override
+    public void clear() {
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = null;
+        }
+        size = 0;
+    }
+
+    /**
+     * Returns a Set view of the keys contained in this map. Not required for this lab.
+     * If you don't implement this, throw an UnsupportedOperationException.
+     */
+    @Override
+    public Set<K> keySet() {
+        return Set.of();
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present,
+     * or null if there is no such mapping.
+     * Not required for this lab. If you don't implement this, throw an
+     * UnsupportedOperationException.
+     *
+     * @param key
+     */
+    @Override
+    public V remove(K key) {
+        return null;
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code T}.
+     *
+     * @return an Iterator.
+     */
+    @Override
+    public Iterator<K> iterator() {
+        return null;
+    }
+
+
 
 }

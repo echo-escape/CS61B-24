@@ -1,0 +1,20 @@
+ordered
+Enter # strings to insert into ULLMap: 100000
+--Stack Overflow -- couldn't add 100000 strings.
+
+Enter # strings to insert into MyHashMap: 100000
+MyHashMap: 0.05 sec
+
+Enter # strings to insert into Java's HashMap: 100000
+Java's Built-in HashMap: 0.02 sec
+
+
+random
+Enter # strings to insert into ULLMap: 10000
+ULLMap: 0.13 sec
+
+Enter # strings to insert into your MyHashMap: 10000
+MyHashMap: 0.01 sec
+
+Enter # strings to insert into Java's HashMap: 10000
+Java's Built-in HashMap: 0.00 sec

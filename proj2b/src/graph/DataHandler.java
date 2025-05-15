@@ -8,8 +8,9 @@ public class DataHandler {
     private final In synsetsAddress;
     private final In hyponymsAddress;
     private Map<Integer, Set<String>> synsetMap;
-    private MyDirectedGraph<Set> graph;
+    private MyDirectedGraph<Integer> graph;
     private Set<String> result;
+    private Set<Integer> visitedSet;
 
     public DataHandler(String synsetsAddress, String hyponymsAddress) {
         this.synsetsAddress = new In(synsetsAddress);
@@ -17,8 +18,8 @@ public class DataHandler {
     }
 
     public void read() {
+        synsetMap = new TreeMap<>();
         while (!synsetsAddress.isEmpty()) {
-            synsetMap = new TreeMap<>();
             String nextLine = synsetsAddress.readLine();
             String[] words = nextLine.split(",");
             int wordId = Integer.parseInt(words[0]);
@@ -27,41 +28,53 @@ public class DataHandler {
             synsetMap.put(wordId, wordsSet);
         }
 
+        graph = new MyDirectedGraph<Integer>();
+        for (Integer wordId : synsetMap.keySet()) {
+            graph.addVertex(wordId);
+        }
         while (!hyponymsAddress.isEmpty()) {
-            graph = new MyDirectedGraph();
             String nextLine = hyponymsAddress.readLine();
             String[] wordsId = nextLine.split(",");
-            Set<String> firstWord = synsetMap.get(Integer.parseInt(wordsId[0]));
-            graph.addVertex(firstWord);
+            Integer parentId = Integer.parseInt(wordsId[0]);
             for (int i = 1; i < wordsId.length; i++) {
-                Set<String> nextWord = synsetMap.get(Integer.parseInt(wordsId[i]));
-                graph.addEdge(firstWord, nextWord);
+                Integer childId = Integer.parseInt(wordsId[i]);
+                graph.addEdge(parentId, childId);
             }
         }
     }
 
     public List<String> search(String target) {
+        visitedSet = new HashSet<>();
         result = new TreeSet<>();
 
-        Queue<Set<String>> queue = new LinkedList<>();
-        Set<Set<String>> visited = new HashSet<>();
-
-        while (!queue.isEmpty()) {
-            Set<String> words = queue.poll();
-            if (words.contains(target)) {
-                Set<String> temp = graphTraversal(words);
-                result.addAll(temp);
+        Set<Integer> allNodes = graph.getVertices();
+        for (Integer node : allNodes) {
+            Set<String> nodeSet = synsetMap.get(node);
+            if (!visitedSet.contains(node) && nodeSet.contains(target)) {
+                graphTraversal(node);
             }
         }
 
-        List<String> newResult = new ArrayList<>(result);
-        Collections.sort(newResult);
-        return newResult;
+        return new ArrayList<>(result);
 
     }
 
-    private Set<String> graphTraversal(Set<String> words) {
+    private void graphTraversal(Integer wordId) {
+        Queue<Integer> fringe = new LinkedList<>();
 
+        fringe.add(wordId);
+        visitedSet.add(wordId);
+
+        while (!fringe.isEmpty()) {
+            Integer node = fringe.poll();
+            result.addAll(synsetMap.get(node));
+            for (Integer neighbor : graph.getNeighbors(node)) {
+                if (!visitedSet.contains(neighbor)) {
+                    fringe.add(neighbor);
+                    visitedSet.add(neighbor);
+                }
+            }
+        }
     }
 
 }

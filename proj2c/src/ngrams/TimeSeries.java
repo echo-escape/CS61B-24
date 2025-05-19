@@ -126,4 +126,8 @@ public class TimeSeries extends TreeMap<Integer, Double> {
 
     // TODO: Add any private helper methods.
     // TODO: Remove all TODO comments before submitting.
+
+    public boolean isEmpty() {
+        return size() == 0;
+    }
 }

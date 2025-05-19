@@ -3,6 +3,7 @@ package main;
 import browser.NgordnetQuery;
 import browser.NgordnetQueryHandler;
 
+import browser.NgordnetQueryType;
 import graph.*;
 import ngrams.*;
 
@@ -23,10 +24,23 @@ public class HyponymsHandler extends NgordnetQueryHandler {
 
     @Override
     public String handle(NgordnetQuery q) {
+        NgordnetQueryType type = q.ngordnetQueryType();
         int k = q.k();
         int endYear = q.endYear();
         int startYear = q.startYear();
         List<String> queryWords = q.words();
+        List<String> results = new ArrayList<>();
+        if (type == NgordnetQueryType.HYPONYMS) {
+           results = dealCommonHyponyms(queryWords, k, endYear, startYear);
+        }
+        else if (type == NgordnetQueryType.ANCESTORS) {
+            results = dealCommonAncestors(queryWords, k, endYear, startYear);
+        }
+        Collections.sort(results);
+        return results.toString();
+    }
+
+    private List<String> dealCommonHyponyms(List<String> queryWords, int k, int endYear, int startYear) {
         List<String> commonHyponyms = new ArrayList<>();
         for (String queryWord : queryWords) {
             List<String> currentHyponymsForCurrent = dataHandler.search(queryWord);
@@ -38,8 +52,21 @@ public class HyponymsHandler extends NgordnetQueryHandler {
             }
         }
         TotalCountsSort sort = new TotalCountsSort(commonHyponyms, ngramMap, k, endYear, startYear);
-        List<String> results = sort.sort();
-        Collections.sort(results);
-        return results.toString();
+        return sort.sort();
+    }
+
+    private List<String> dealCommonAncestors(List<String> queryWords, int k, int endYear, int startYear) {
+        List<String> commonAncestors = new ArrayList<>();
+        for (String queryWord : queryWords) {
+            List<String> commonAncestorsForCurrent = dataHandler.searchAncestors(queryWord);
+            if (commonAncestorsForCurrent.isEmpty()) {
+                commonAncestors.addAll(commonAncestorsForCurrent);
+            }
+            else {
+                commonAncestors.retainAll(commonAncestorsForCurrent);
+            }
+        }
+        TotalCountsSort sort = new TotalCountsSort(commonAncestors, ngramMap, k, endYear, startYear);
+        return sort.sort();
     }
 }

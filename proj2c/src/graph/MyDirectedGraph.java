@@ -25,6 +25,37 @@ public class MyDirectedGraph<T> {
         neighbors.add(vertex2);
     }
 
+    private List<T> getParents(T vertex) {
+        List<T> parents = new ArrayList<>();
+        for (T parent : getVertices()) {
+            if (adjacencyList.get(parent).contains(vertex)) {
+                parents.add(parent);
+            }
+        }
+        return parents;
+    }
+
+    public List<T> getAllAncestors(T vertex) {
+        Set<T> allAncestors = new HashSet<>();
+        allAncestors.addAll(getAllAncestorsRecursively(vertex, allAncestors));
+        return new ArrayList<>(allAncestors);
+
+    }
+
+    private Set<T> getAllAncestorsRecursively(T vertex, Set<T> allAncestors) {
+        List<T> parents = getParents(vertex);
+        if (parents.isEmpty()) {
+            return allAncestors;
+        }
+        for (T parent : parents) {
+            if (allAncestors.add(parent)) {
+                getAllAncestorsRecursively(parent, allAncestors);
+            }
+
+        }
+        return allAncestors;
+    }
+
     public Set<T> getVertices() {
         return adjacencyList.keySet();
     }

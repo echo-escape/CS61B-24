@@ -23,15 +23,11 @@ public class TotalCountsSort {
             map.put(i, words.get(i));
         }
         countsSorted = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            countsSorted.add(i, i);
-        }
         this.ngramMap = ngramMap;
     }
 
     private void sortCountedSorted() {
         read();
-        check();
         for (int i = 0; i < countsSorted.size(); i++) {
             for (int j = i; j < countsSorted.size() - 1; j++) {
                 Integer valAtIndexJ = countsSorted.get(j);
@@ -46,28 +42,20 @@ public class TotalCountsSort {
 
     private void read() {
         counts = new HashMap<>();
-        for (int i = 0; i < countsSorted.size(); i++) {
+        for (Integer i : map.keySet()) {
             TimeSeries ts = ngramMap.countHistory(map.get(i), startYear, endYear);
-            List<Double> data = ts.data();
-            int sum = 0;
-            for (Double datum : data) {
-                sum += datum;
+            if (!ts.isEmpty()) {
+                List<Double> data = ts.data();
+                int sum = 0;
+                for (Double datum : data) {
+                    sum += datum;
+                }
+                counts.put(i, sum);
+                countsSorted.add(i);
             }
-            counts.put(i, sum);
         }
     }
 
-    private void check() {
-        List<Integer> sorted = new ArrayList<>();
-        for (int i = 0; i < countsSorted.size(); i++) {
-            if (counts.containsKey(countsSorted.get(i))) {
-                sorted.add(countsSorted.get(i));
-            }
-        }
-        Collections.sort(sorted);
-        countsSorted.clear();
-        countsSorted.addAll(sorted);
-    }
 
     public List<String> sort() {
         sortCountedSorted();

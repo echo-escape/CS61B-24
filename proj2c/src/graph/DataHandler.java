@@ -77,4 +77,32 @@ public class DataHandler {
         }
     }
 
+    private List<String> searchAncestorsHepler(Integer wordId) {
+        Set<String> newResult = new TreeSet<>();
+        List<Integer> ancestorsIds = graph.getAllAncestors(wordId);
+        for (Integer ancestorId : ancestorsIds) {
+            Set<String> ancestorSet = synsetMap.get(ancestorId);
+            newResult.addAll(ancestorSet);
+        }
+        return new ArrayList<>(newResult);
+    }
+
+    public List<String> searchAncestors(String target) {
+        result = new TreeSet<>();
+        Set<Integer> resultIds = new TreeSet<>();
+        Set<Integer> allNodes = graph.getVertices();
+        for (Integer node : allNodes) {
+            Set<String> nodeSet = synsetMap.get(node);
+            if (nodeSet.contains(target)) {
+                resultIds.add(node);
+            }
+        }
+        for (Integer nodeId : resultIds) {
+            result.addAll(searchAncestorsHepler(nodeId));
+        }
+        return new ArrayList<>(result);
+    }
+
+
+
 }

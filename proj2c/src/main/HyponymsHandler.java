@@ -59,14 +59,13 @@ public class HyponymsHandler extends NgordnetQueryHandler {
         List<String> commonAncestors = new ArrayList<>();
         for (String queryWord : queryWords) {
             List<String> commonAncestorsForCurrent = dataHandler.searchAncestors(queryWord);
-            if (commonAncestorsForCurrent.isEmpty()) {
+            if (commonAncestors.isEmpty()) {
                 commonAncestors.addAll(commonAncestorsForCurrent);
             }
             else {
                 commonAncestors.retainAll(commonAncestorsForCurrent);
             }
         }
-        TotalCountsSort sort = new TotalCountsSort(commonAncestors, ngramMap, k, endYear, startYear);
-        return sort.sort();
+        return commonAncestors;
     }
 }

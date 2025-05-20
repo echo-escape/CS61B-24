@@ -22,7 +22,7 @@ public class TestCommonAncestors {
     @Test
     public void testSpecAdjustment() {
         NgordnetQueryHandler studentHandler = AutograderBuddy.getHyponymsHandler(
-                WORDS_FILE, TOTAL_COUNTS_FILE, SMALL_SYNSET_FILE, SMALL_HYPONYM_FILE);
+                LARGE_WORDS_FILE, TOTAL_COUNTS_FILE, SMALL_SYNSET_FILE, SMALL_HYPONYM_FILE);
         List<String> words = List.of("adjustment");
 
         NgordnetQuery nq = new NgordnetQuery(words, 2000, 2020, 0, NgordnetQueryType.ANCESTORS);

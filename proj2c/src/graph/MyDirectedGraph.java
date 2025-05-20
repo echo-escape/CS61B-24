@@ -43,6 +43,7 @@ public class MyDirectedGraph<T> {
     }
 
     private Set<T> getAllAncestorsRecursively(T vertex, Set<T> allAncestors) {
+        allAncestors.add(vertex);
         List<T> parents = getParents(vertex);
         if (parents.isEmpty()) {
             return allAncestors;

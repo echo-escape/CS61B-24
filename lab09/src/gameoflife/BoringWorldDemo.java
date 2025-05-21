@@ -32,6 +32,28 @@ public class BoringWorldDemo {
             }
         }
 
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 1] = Tileset.AVATAR;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 2] = Tileset.CELL;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 3] = Tileset.SAND;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 4] = Tileset.WATER;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 5] = Tileset.WALL;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 6] = Tileset.MOUNTAIN;
+        }
+        for (int x = 0; x < WIDTH; x++) {
+            world[x][HEIGHT - 7] = Tileset.TREE;
+        }
+
         // draws the world to the screen
         ter.renderFrame(world);
     }

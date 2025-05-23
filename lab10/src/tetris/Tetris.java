@@ -5,6 +5,7 @@ import tileengine.TETile;
 import tileengine.TERenderer;
 import tileengine.Tileset;
 
+import java.awt.*;
 import java.util.*;
 
 /**
@@ -92,6 +93,24 @@ public class Tetris {
 
         // TODO: Implement interactivity, so the user is able to input the keystrokes to move
         //  the tile and rotate the tile. You'll want to use some provided helper methods here.
+        if (StdDraw.hasNextKeyTyped()) {
+            char c = StdDraw.nextKeyTyped();
+            if (c == 's') {
+                movement.tryMove(0, -1);
+            }
+            else if (c == 'a') {
+                movement.tryMove(-1, 0);
+            }
+            else if (c == 'd') {
+                movement.tryMove(1, 0);
+            }
+            else if (c == 'q') {
+                movement.rotateLeft();
+            }
+            else if (c == 'w') {
+                movement.rotateRight();
+            }
+        }
 
 
         Tetromino.draw(t, board, t.pos.x, t.pos.y);
@@ -104,6 +123,18 @@ public class Tetris {
      */
     private void incrementScore(int linesCleared) {
         // TODO: Increment the score based on the number of lines cleared.
+        if (linesCleared == 1) {
+            score += 100;
+        }
+        else if (linesCleared == 2) {
+            score += 300;
+        }
+        else if (linesCleared == 3) {
+            score += 500;
+        }
+        else if (linesCleared == 4) {
+            score += 800;
+        }
 
     }
 
@@ -115,13 +146,61 @@ public class Tetris {
     public void clearLines(TETile[][] tiles) {
         // Keeps track of the current number lines cleared
         int linesCleared = 0;
+        int numCols = Tetris.WIDTH;
+        int numRows = Tetris.GAME_HEIGHT;
 
+        TETile[][] tempBoard = new TETile[numCols][numRows];
+        for (int c = 0; c < numCols; c++) {
+            for (int r = 0; r < numRows; r++) {
+                tempBoard[c][r] = Tileset.NOTHING;
+            }
+        }
+
+
+        int nextRowToFill = 0; // This will be the row index in tempBoard where the next non-cleared line is placed
+
+        // Iterate over each row of the original board from bottom (0) to top (numRows - 1)
+        for (int r = 0; r < numRows; r++) {
+            boolean isRowFull = true;
+            // Check if current row 'r' is full
+            for (int c = 0; c < numCols; c++) {
+                if (tiles[c][r] == Tileset.NOTHING) {
+                    isRowFull = false;
+                    break;
+                }
+            }
+            if (isRowFull) {
+                linesCleared++;
+            } else {
+                if (nextRowToFill < numRows) {
+                    for (int c = 0; c < numCols; c++) {
+                        tempBoard[c][nextRowToFill] = tiles[c][r];
+                    }
+                    nextRowToFill++;
+                }
+            }
+        }
+
+        if (linesCleared > 0) {
+            for (int c = 0; c < numCols; c++) {
+                // System.arraycopy(sourceArray, srcPos, destArray, destPos, length);
+                System.arraycopy(tempBoard[c], 0, tiles[c], 0, numRows);
+            }
+        }
         // TODO: Check how many lines have been completed and clear it the rows if completed.
 
+
         // TODO: Increment the score based on the number of lines cleared.
+        incrementScore(linesCleared);
 
         fillAux();
     }
+
+
+
+
+
+
 
     /**
      * Where the game logic takes place. The game should continue as long as the game isn't
@@ -132,8 +211,15 @@ public class Tetris {
 
         // TODO: Set up your game loop. The game should keep running until the game is over.
         // Use helper methods inside your game loop, according to the spec description.
-
-
+        while (!isGameOver) {
+            spawnPiece();
+            while (currentTetromino != null) {
+                updateBoard();
+                renderBoard();
+            }
+            clearLines(board);
+            renderBoard();
+        }
     }
 
     /**
@@ -141,7 +227,10 @@ public class Tetris {
      */
     private void renderScore() {
         // TODO: Use the StdDraw library to draw out the score.
-
+        StdDraw.setPenColor(StdDraw.WHITE);
+        Font font = new Font("TimesRoman", Font.PLAIN, 10);
+        StdDraw.setFont(font);
+        StdDraw.text(7, 19, "Score: " + score);
     }
 
     /**
